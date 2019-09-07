@@ -1,6 +1,6 @@
 #!venv/bin/python
 import os
-from flask import Flask, escape, url_for, abort, redirect, make_response, request
+from flask import Flask, escape, url_for, abort, redirect, make_response, request, render_template
 from flask_sqlalchemy import SQLAlchemy
 
 # Create Flask application
@@ -18,7 +18,7 @@ def build_sample_db():
 # Flask index route
 @app.route('/')
 def index():
-    return "Hello World!"
+    return render_template('index.html')
 
 
 if __name__ == '__main__':
