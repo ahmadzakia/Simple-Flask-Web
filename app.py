@@ -8,6 +8,15 @@ app = Flask(__name__)
 app.config.from_pyfile('config.py')
 db = SQLAlchemy(app)
 
+class User(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    first_name = db.Column(db.String(255))
+    last_name = db.Column(db.String(255))
+    email = db.Column(db.String(255), unique=True)
+    active = db.Column(db.Boolean())
+
+    def __str__(self):
+        return self.email
 
 def build_sample_db():
     import string
@@ -18,7 +27,16 @@ def build_sample_db():
 # Flask index route
 @app.route('/')
 def index():
-    return render_template('index.html')
+    current_user = User(
+                first_name = 'Ahmad Zaki',
+                last_name = 'Anshori',
+                email = 'email@gmail.com',
+                active = True
+            )
+    data = {
+        'user' : current_user
+    }
+    return render_template('index.html',data=data)
 
 
 if __name__ == '__main__':
