@@ -1,0 +1,14 @@
+<!-- Exports header and navbar from header.html 
+     or any file you want-->
+{% block body %} 
+  
+<link rel="stylesheet" href="{{url_for('static',filename='css/bootstrap.min.css')}}" />
+<div class="container">
+	<div class="text-center">
+		<h1>Oops! Looks like the page doesn't exist anymore</h1> 
+		<a href="{{ url_for('index') }}"><p>Click Here</a>To go to the Home Page</p> 	
+	</div>
+</div>
+  
+<!-- {{ url_for('index') }} is a var which returns url of index.html-->
+{% endblock %} 
