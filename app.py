@@ -25,19 +25,27 @@ def build_sample_db():
     return
 
 # Flask index route
-@app.route('/')
+@app.route('/index', methods = ['POST', 'GET'])
+@app.route('/', methods = ['POST', 'GET'])
 def index():
-    current_user = User(
-                first_name = 'Ahmad Zaki',
-                last_name = 'Anshori',
-                email = 'email@gmail.com',
-                active = True
-            )
-    data = {
-        'user' : current_user
-    }
-    return render_template('index.html',data=data)
+    if request.method == 'GET':
+        current_user = User(
+                    first_name = 'Ahmad Zaki',
+                    last_name = 'Anshori',
+                    email = 'email@gmail.com',
+                    active = True
+                )
+        data = {
+            'user' : current_user
+        }
+        return render_template('index.html',data=data)
+    else:
+        return render_template('404.html')
 
+@app.errorhandler(404)
+
+def not_found(e):
+    return render_template('404.html')
 
 if __name__ == '__main__':
 
