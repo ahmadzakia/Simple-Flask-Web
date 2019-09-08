@@ -22,28 +22,45 @@ def build_sample_db():
     import string
     db.drop_all()
     db.create_all()
+
+    first_user = User(
+        first_name = 'Ahmad Zaki',
+        last_name = 'Anshori',
+        email = 'admin@admin.com',
+        active = True
+    )
+    db.session.add(first_user)
+    db.session.commit()
     return
+
+@app.route('/member', methods = ['POST', 'GET'])
+def member():
+    if request.method == 'GET':
+        all_user = User.query.all();
+        data = {
+            'all_user': all_user
+        }
+
+        return render_template('member.html', data=all_user)
+    else:
+        return render_template('404.html')
+
+
 
 # Flask index route
 @app.route('/index', methods = ['POST', 'GET'])
 @app.route('/', methods = ['POST', 'GET'])
 def index():
     if request.method == 'GET':
-        current_user = User(
-                    first_name = 'Ahmad Zaki',
-                    last_name = 'Anshori',
-                    email = 'email@gmail.com',
-                    active = True
-                )
+        last_user = User.query.order_by(User.id.desc()).first()
         data = {
-            'user' : current_user
+            'user' : last_user
         }
         return render_template('index.html',data=data)
     else:
         return render_template('404.html')
 
 @app.errorhandler(404)
-
 def not_found(e):
     return render_template('404.html')
 
