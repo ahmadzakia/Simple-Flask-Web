@@ -1,8 +1,8 @@
 #!venv/bin/python
 import os
-from flask import Flask, escape, url_for, abort, redirect, make_response, request, render_template
+from flask import Flask, escape, url_for, abort, redirect, make_response, request, render_template, jsonify
 from flask_sqlalchemy import SQLAlchemy
-
+import json
 # Create Flask application
 app = Flask(__name__)
 app.config.from_pyfile('config.py')
@@ -17,7 +17,13 @@ class User(db.Model):
 
     def __str__(self):
         return self.email
-
+    def serializable(self):
+        return{
+            'first_name':self.first_name,
+            'last_name':self.last_name,
+            'email':self.email,
+            'is_active':self.active,
+        }
 def build_sample_db():
     import string
     db.drop_all()
@@ -32,8 +38,28 @@ def build_sample_db():
     db.session.add(first_user)
     db.session.commit()
     return
+@app.route('/api/v1.0/get_all_members/', methods=['POST'])
+def getAllMembers():
+    all_user = User.query.all()
+    response = [row.serializable() for row in all_user]
+    return jsonify(response),201
 
-@app.route('/member', methods = ['POST', 'GET'])
+@app.route('/api/v1.0/get_member_by_id/<int:member_id>', methods=['POST'])
+def getMemberById(member_id):
+    member = User.query.get(member_id)
+    if member==None:
+        return jsonify({})
+    return jsonify(member.serializable()),201
+
+@app.route('/api/v1.0/get_member_by_email/<email>', methods=['POST'])
+def getMemberByEmail(email):
+    member = User.query.filter_by(email=email).first()
+    if member==None:
+        return jsonify({})
+    return jsonify(member.serializable()),201
+
+
+@app.route('/member', methods = ['GET'])
 def member():
     if request.method == 'GET':
         all_user = User.query.all();
@@ -44,8 +70,6 @@ def member():
         return render_template('member.html', data=all_user)
     else:
         return render_template('404.html')
-
-
 
 # Flask index route
 @app.route('/index', methods = ['POST', 'GET'])
