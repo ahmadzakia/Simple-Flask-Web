@@ -36,27 +36,51 @@ def build_sample_db():
         active = True
     )
     db.session.add(first_user)
+    for x in range(10):
+        db.session.add(
+            User(      
+            first_name = 'User ',
+            last_name = ''+str(x),
+            email = 'user'+str(x)+'@gmail.com',
+            active = False
+            ))
     db.session.commit()
+    
     return
 @app.route('/api/v1.0/get_all_members/', methods=['POST'])
 def getAllMembers():
     all_user = User.query.all()
     response = [row.serializable() for row in all_user]
-    return jsonify(response),201
+    return jsonify({
+            "data":response
+        })
 
 @app.route('/api/v1.0/get_member_by_id/<int:member_id>', methods=['POST'])
 def getMemberById(member_id):
     member = User.query.get(member_id)
     if member==None:
-        return jsonify({})
-    return jsonify(member.serializable()),201
+        return jsonify({
+            "error": {
+                "code": 404,
+                "message": "ID not found"
+              }
+            })
+    return jsonify({
+        "data":member.serializable()
+        })
 
 @app.route('/api/v1.0/get_member_by_email/<email>', methods=['POST'])
 def getMemberByEmail(email):
     member = User.query.filter_by(email=email).first()
     if member==None:
-        return jsonify({})
-    return jsonify(member.serializable()),201
+        return jsonify({"error": {
+                "code": 404,
+                "message": "Email not found"
+              }
+            })
+    return jsonify({
+        "data":member.serializable()
+        })
 
 
 @app.route('/member', methods = ['GET'])
