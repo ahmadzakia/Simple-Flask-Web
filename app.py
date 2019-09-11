@@ -45,8 +45,8 @@ def build_sample_db():
             active = False
             ))
     db.session.commit()
-    
     return
+
 @app.route('/api/v1.0/get_all_members/', methods=['POST'])
 def getAllMembers():
     all_user = User.query.all()
@@ -82,6 +82,34 @@ def getMemberByEmail(email):
         "data":member.serializable()
         })
 
+@app.route('/api/v1.0/get_member_by_status/<int:status>', methods=['POST'])
+def getMemberByStatus(status):
+    is_active = False
+    if status==1:
+        is_active=True
+    elif status==0:
+        is_active=False
+    else:
+        return jsonify({
+            "error": {
+                "code": 404,
+                "message": "Status not found"
+              }
+            })
+    member = User.query.filter_by(active=is_active).all()
+    
+    response = [row.serializable() for row in member]
+
+    if member==None:
+        return jsonify({
+            "error": {
+                "code": 404,
+                "message": "User not found"
+              }
+            })
+    return jsonify({
+        "data":response
+        })
 
 @app.route('/member', methods = ['GET'])
 def member():
@@ -96,8 +124,8 @@ def member():
         return render_template('404.html')
 
 # Flask index route
-@app.route('/index', methods = ['POST', 'GET'])
-@app.route('/', methods = ['POST', 'GET'])
+@app.route('/index', methods = ['GET'])
+@app.route('/', methods = ['GET'])
 def index():
     if request.method == 'GET':
         last_user = User.query.order_by(User.id.desc()).first()
